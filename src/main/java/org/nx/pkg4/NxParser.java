@@ -44,6 +44,8 @@ public class NxParser implements NxContainer {
   
   private List<String> strings;
   
+  private List<Long> bitmapOffsets;
+  
   public NxParser(Path path) {
     this.path = path;
   }
@@ -55,19 +57,18 @@ public class NxParser implements NxContainer {
     
     header = parseHeader(buf);
     strings = parseStrings(header, buf);
+    bitmapOffsets = parseBitmapOffsets(header, buf);
     nodes = parseNodes(header, buf);
-    
-    file.close();
     
     return this;
   }
   
-  public List<NxNode> getNodes() {
-    return nodes;
+  public NxNode getNode(int id) {
+    return nodes.get(id);
   }
   
   public NxNode getRootNode() {
-    return nodes.get(0);
+    return getNode(0);
   }
   
   private NxHeader parseHeader(ByteBuf buf) throws IOException {
@@ -115,7 +116,7 @@ public class NxParser implements NxContainer {
         node = new NxVectorNode(this, i, name, firstChildId, childrenCount, new Point(data.readInt(), data.readInt()));
         break;
       case TYPE_BITMAP:
-        node = new NxBitmapNode(this, i, name, firstChildId, childrenCount);
+        node = new NxBitmapNode(this, i, name, firstChildId, childrenCount, bitmapOffsets.get((int) data.readUnsignedInt()), data.readUnsignedShort(), data.readUnsignedShort(), buf);
         break;
       case TYPE_AUDIO:
         node = new NxAudioNode(this, i, name, firstChildId, childrenCount);
@@ -147,5 +148,18 @@ public class NxParser implements NxContainer {
     }
     
     return strings;
+  }
+  
+  private List<Long> parseBitmapOffsets(NxHeader header, ByteBuf buf) {
+    buf.readerIndex((int) header.getBitmapTableOffset());
+    
+    int bitmapCount = (int) header.getBitmapCount();
+    List<Long> offsets = new ArrayList<Long>(bitmapCount);
+    
+    for(int i = 0; i < bitmapCount; i++) {
+      offsets.add(buf.readLong());
+    }
+    
+    return offsets;
   }
 }
