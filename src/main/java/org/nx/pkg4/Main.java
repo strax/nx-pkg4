@@ -10,5 +10,6 @@ public class Main {
     NxParser parser = new NxParser(Paths.get("Data.nx"));
     NxNode root = parser.parse().getRootNode();
     Collection<NxNode> mobs = root.getChild("Mob").getChildren();
+    Object value = mobs.iterator().next().getValue();
   }
 }

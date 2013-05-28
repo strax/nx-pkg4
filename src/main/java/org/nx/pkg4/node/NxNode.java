@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.nx.pkg4.NxContainer;
 
-public abstract class NxNode<T> {
+public abstract class NxNode {
   private final long id;
   
   private long firstChildId;
@@ -17,11 +17,11 @@ public abstract class NxNode<T> {
   
   private String name;
   
-  private T value;
+  private Object value;
 
   private NxContainer container;
   
-  public NxNode(NxContainer container, long id, String name, long firstChildId, int childrenCount, T value) {
+  public NxNode(NxContainer container, long id, String name, long firstChildId, int childrenCount, Object value) {
     this.id = id;
     this.name = name;
     this.firstChildId = firstChildId;
@@ -46,7 +46,7 @@ public abstract class NxNode<T> {
     return childrenCount;
   }
   
-  public T getValue() {
+  public Object getValue() {
     return value;
   }
   
