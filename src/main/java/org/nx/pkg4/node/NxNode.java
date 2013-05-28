@@ -1,8 +1,9 @@
 package org.nx.pkg4.node;
 
-import java.awt.Container;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.nx.pkg4.NxContainer;
 
@@ -12,8 +13,7 @@ public abstract class NxNode<T> {
   private long firstChildId;
   private int childrenCount;
   
-  // Cached children
-  private List<NxNode> children;
+  private Map<String, NxNode> children;
   
   private String name;
   
@@ -30,23 +30,55 @@ public abstract class NxNode<T> {
     this.container = container;
   }
   
+  public String getName() {
+    return name;
+  }
+  
+  public long getId() {
+    return id;
+  }
+  
   public boolean hasChildren() {
     return childrenCount == 0;
+  }
+  
+  public int getChildrenCount() {
+    return childrenCount;
   }
   
   public T getValue() {
     return value;
   }
   
-  public List<NxNode> getChildren() {
+  public NxNode getChild(String name) {
     if(childrenCount == 0) {
-      return new ArrayList<NxNode>();
+      return null;
     }
     if(children == null) {
-      children = new ArrayList<NxNode>(childrenCount);
-      for(int i = (int) firstChildId; i < firstChildId + childrenCount; i++) {
-        children.add(container.getNodes().get(i));
-      }
+      children = fetchChildren();
+    }
+    return children.get(name);
+  }
+  
+  public Collection<NxNode> getChildren() {
+    if(childrenCount == 0) {
+      return Collections.emptyList();
+    }
+    if(children == null) {
+      children = fetchChildren();
+    }
+    return children.values();
+  }
+  
+  public String toString() {
+    return name;
+  }
+  
+  private Map<String, NxNode> fetchChildren() {
+    Map<String, NxNode> children = new HashMap<>();
+    for(int i = (int) firstChildId; i < firstChildId + childrenCount; i++) {
+      NxNode node = container.getNodes().get(i);
+      children.put(node.getName(), node);
     }
     return children;
   }

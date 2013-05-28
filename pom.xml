@@ -21,5 +21,10 @@
   		<artifactId>javassist</artifactId>
   		<version>3.12.1.GA</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.google.guava</groupId>
+  		<artifactId>guava</artifactId>
+  		<version>14.0.1</version>
+  	</dependency>
   </dependencies>
 </project>
