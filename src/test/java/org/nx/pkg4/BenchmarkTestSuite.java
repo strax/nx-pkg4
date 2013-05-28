@@ -64,7 +64,7 @@ public class BenchmarkTestSuite implements Runnable {
       test("PR", 2, new PRTest());
       test("Re", 2, new ReTest());
     } catch(Throwable t) {
-      LOGGER.log(Level.SEVERE, "Uncaught exeption", t);
+      LOGGER.log(Level.SEVERE, "Uncaught exception", t);
     }
   }
   

@@ -139,7 +139,7 @@ public class NxParser implements NxContainer {
     buf.readerIndex((int) header.getStringTableOffset());
 
     int stringCount = (int) header.getStringCount();    
-    List<String> strings = new ArrayList<String>(stringCount);
+    List<String> strings = new ArrayList<>(stringCount);
     
     for(int i = 0; i < stringCount; i++) {
       int offset = (int) buf.readLong();
@@ -159,7 +159,7 @@ public class NxParser implements NxContainer {
     buf.readerIndex((int) header.getBitmapTableOffset());
     
     int bitmapCount = (int) header.getBitmapCount();
-    List<Long> offsets = new ArrayList<Long>(bitmapCount);
+    List<Long> offsets = new ArrayList<>(bitmapCount);
     
     for(int i = 0; i < bitmapCount; i++) {
       offsets.add(buf.readLong());
