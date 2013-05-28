@@ -59,8 +59,8 @@ public class BenchmarkTestSuite implements Runnable {
   public void run() {
     LOGGER.info("Running NX test suite");
     try {
-      test("Ld", 5, new LdTest());
-      test("SS", 10, new SSTest());
+      test("Ld", 1000, new LdTest());
+      test("SS", 1000, new SSTest());
       test("PR", 2, new PRTest());
       test("Re", 2, new ReTest());
     } catch(Throwable t) {

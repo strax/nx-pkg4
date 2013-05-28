@@ -13,7 +13,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.nx.pkg4.node.NxAudioNode;
 import org.nx.pkg4.node.NxBitmapNode;
@@ -38,9 +40,11 @@ public class NxParser implements NxContainer {
   
   private final Path path;
   
+  private ByteBuf buf;
+  
   private NxHeader header;
   
-  private List<NxNode> nodes;
+  private NxNode[] nodes;
   
   private List<String> strings;
   
@@ -53,18 +57,25 @@ public class NxParser implements NxContainer {
   public NxParser parse() throws IOException {
     FileChannel file = FileChannel.open(path);
     MappedByteBuffer mapping = file.map(MapMode.READ_ONLY, 0, file.size());
-    ByteBuf buf = Unpooled.wrappedBuffer(mapping).order(ByteOrder.LITTLE_ENDIAN);
+    buf = Unpooled.wrappedBuffer(mapping).order(ByteOrder.LITTLE_ENDIAN);
     
     header = parseHeader(buf);
     strings = parseStrings(header, buf);
     bitmapOffsets = parseBitmapOffsets(header, buf);
-    nodes = parseNodes(header, buf);
+    
+    nodes = new NxNode[(int) header.getNodeCount()];
     
     return this;
   }
   
   public NxNode getNode(int id) {
-    return nodes.get(id);
+    if(nodes[id] == null) {
+      NxNode node = parseNode(id, header, buf);
+      nodes[id] = node;
+      return node;
+    } else {
+      return nodes[id];
+    }
   }
   
   public NxNode getRootNode() {
@@ -88,46 +99,40 @@ public class NxParser implements NxContainer {
         buf.readLong());
   }
   
-  private List<NxNode> parseNodes(NxHeader header, ByteBuf buf) {
-    buf.readerIndex((int) header.getNodeOffset());
+  private NxNode parseNode(long id, NxHeader header, ByteBuf buf) {
+    buf.readerIndex((int) (header.getNodeOffset() + id * 20));
     
-    int nodeCount = (int) header.getNodeCount();
-    List<NxNode> nodes = new ArrayList<NxNode>(nodeCount);
+    String name = strings.get((int) buf.readUnsignedInt());
+    int firstChildId = (int) buf.readUnsignedInt();
+    int childrenCount = buf.readUnsignedShort();
+    int type = buf.readUnsignedShort();
+    ByteBuf data = buf.readBytes(8);
     
-    for(int i = 0; i < nodeCount; i++) {
-      String name = strings.get((int) buf.readUnsignedInt());
-      int firstChildId = (int) buf.readUnsignedInt();
-      int childrenCount = buf.readUnsignedShort();
-      int type = buf.readUnsignedShort();
-      ByteBuf data = buf.readBytes(8);
-      
-      NxNode node;
-      switch(type) {
-      case TYPE_LONG:
-        node = new NxLongNode(this, i, name, firstChildId, childrenCount, data.readLong());
-        break;
-      case TYPE_DOUBLE:
-        node = new NxDoubleNode(this, i, name, firstChildId, childrenCount, data.readDouble());
-        break;
-      case TYPE_STRING:
-        node = new NxStringNode(this, i, name, firstChildId, childrenCount, strings.get((int) data.readUnsignedInt()));
-        break;
-      case TYPE_VECTOR:
-        node = new NxVectorNode(this, i, name, firstChildId, childrenCount, new Point(data.readInt(), data.readInt()));
-        break;
-      case TYPE_BITMAP:
-        node = new NxBitmapNode(this, i, name, firstChildId, childrenCount, bitmapOffsets.get((int) data.readUnsignedInt()), data.readUnsignedShort(), data.readUnsignedShort(), buf);
-        break;
-      case TYPE_AUDIO:
-        node = new NxAudioNode(this, i, name, firstChildId, childrenCount);
-        break;
-      case TYPE_EMPTY:
-      default:
-        node = new NxEmptyNode(this, i, name, firstChildId, childrenCount);
-      }
-      nodes.add(node);
+    NxNode node;
+    switch(type) {
+    case TYPE_LONG:
+      node = new NxLongNode(this, id, name, firstChildId, childrenCount, data.readLong());
+      break;
+    case TYPE_DOUBLE:
+      node = new NxDoubleNode(this, id, name, firstChildId, childrenCount, data.readDouble());
+      break;
+    case TYPE_STRING:
+      node = new NxStringNode(this, id, name, firstChildId, childrenCount, strings.get((int) data.readUnsignedInt()));
+      break;
+    case TYPE_VECTOR:
+      node = new NxVectorNode(this, id, name, firstChildId, childrenCount, new Point(data.readInt(), data.readInt()));
+      break;
+    case TYPE_BITMAP:
+      node = new NxBitmapNode(this, id, name, firstChildId, childrenCount, bitmapOffsets.get((int) data.readUnsignedInt()), data.readUnsignedShort(), data.readUnsignedShort(), buf);
+      break;
+    case TYPE_AUDIO:
+      node = new NxAudioNode(this, id, name, firstChildId, childrenCount);
+      break;
+    case TYPE_EMPTY:
+    default:
+      node = new NxEmptyNode(this, id, name, firstChildId, childrenCount);
     }
-    return nodes;
+    return node;
   }
   
   private List<String> parseStrings(NxHeader header, ByteBuf buf) {
