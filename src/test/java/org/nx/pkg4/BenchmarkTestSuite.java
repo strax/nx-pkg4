@@ -31,7 +31,8 @@ public class BenchmarkTestSuite implements Runnable {
   
   private class SSTest implements Runnable {
     public void run() {
-      NxNode node = parser.root().get("Map").get("Map").get("Map1").get("105060000.img").get("1").get("tile");
+      //NxNode node = parser.root().get("Map").get("Map").get("Map1").get("105060000.img").get("1").get("tile");
+      NxNode node = parser.node("Map/Map/Map1/105060000.img/1/tile");
       for(NxNode subnode : node.children()) {
         if(node.get(subnode.name()) != subnode)
           throw new IllegalStateException("Indexed subnode does not equal iterated subnode");

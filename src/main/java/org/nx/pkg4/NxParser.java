@@ -1,5 +1,6 @@
 package org.nx.pkg4;
 
+import com.google.common.base.CharMatcher;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -76,6 +77,18 @@ public class NxParser implements NxContainer {
     } else {
       return nodes[id];
     }
+  }
+
+  public NxNode node(String path) {
+    // Trim '/' from the beginning and from the end of the path
+    path = CharMatcher.is('/').trimFrom(path);
+
+    NxNode node = root();
+    for(String segment : path.split("/")) {
+      node = node.get(segment);
+      if(node == null) return null;
+    }
+    return node;
   }
   
   public NxNode root() {
