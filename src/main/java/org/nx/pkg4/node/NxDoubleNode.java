@@ -11,7 +11,7 @@ public class NxDoubleNode extends NxNode {
     this.value = value;
   }
   
-  public Double getValue() {
+  public Double value() {
     return value;
   }
 }

@@ -68,7 +68,7 @@ public class NxParser implements NxContainer {
     return this;
   }
   
-  public NxNode getNode(int id) {
+  public NxNode node(int id) {
     if(nodes[id] == null) {
       NxNode node = parseNode(id, header, buf);
       nodes[id] = node;
@@ -78,8 +78,8 @@ public class NxParser implements NxContainer {
     }
   }
   
-  public NxNode getRootNode() {
-    return getNode(0);
+  public NxNode root() {
+    return node(0);
   }
   
   private NxHeader parseHeader(ByteBuf buf) throws IOException {

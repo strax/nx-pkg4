@@ -24,7 +24,7 @@ public class NxBitmapNode extends NxNode {
     this.height = height;
   }
   
-  public BufferedImage getValue() {
+  public BufferedImage value() {
     if(value == null) {
       buf.readerIndex((int) offset);
       long length = buf.readUnsignedInt();

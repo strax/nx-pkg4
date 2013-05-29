@@ -7,7 +7,7 @@ public class NxEmptyNode extends NxNode {
     super(container, id, name, firstChildId, childrenCount);
   }
   
-  public Object getValue() {
+  public Object value() {
     return null;
   }
 }

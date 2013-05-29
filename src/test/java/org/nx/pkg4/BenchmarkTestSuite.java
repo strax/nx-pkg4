@@ -31,9 +31,9 @@ public class BenchmarkTestSuite implements Runnable {
   
   private class SSTest implements Runnable {
     public void run() {
-      NxNode node = parser.getRootNode().getChild("Map").getChild("Map").getChild("Map1").getChild("105060000.img").getChild("1").getChild("tile");
-      for(NxNode subnode : node.getChildren()) {
-        if(node.getChild(subnode.getName()) != subnode)
+      NxNode node = parser.root().get("Map").get("Map").get("Map1").get("105060000.img").get("1").get("tile");
+      for(NxNode subnode : node.children()) {
+        if(node.get(subnode.name()) != subnode)
           throw new IllegalStateException("Indexed subnode does not equal iterated subnode");
       }
     }
@@ -43,7 +43,7 @@ public class BenchmarkTestSuite implements Runnable {
     public void run() {
       try {
         NxContainer container = parser().parse();
-        recurse(container.getRootNode());
+        recurse(container.root());
       } catch(Throwable t) {
         LOGGER.log(Level.WARNING, "PR test failed", t);
       }
@@ -52,7 +52,7 @@ public class BenchmarkTestSuite implements Runnable {
   
   private class ReTest implements Runnable {
     public void run() {
-      recurse(parser.getRootNode());
+      recurse(parser.root());
     }
   }
   
@@ -91,7 +91,7 @@ public class BenchmarkTestSuite implements Runnable {
   }
   
   private void recurse(NxNode node) {
-    for(NxNode subnode : node.getChildren()) {
+    for(NxNode subnode : node.children()) {
       recurse(subnode);
     }
   }

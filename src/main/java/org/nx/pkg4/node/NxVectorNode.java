@@ -13,7 +13,7 @@ public class NxVectorNode extends NxNode {
     this.value = value;
   }
   
-  public Point getValue() {
+  public Point value() {
     return value;
   }
 }

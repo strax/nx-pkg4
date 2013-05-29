@@ -27,11 +27,11 @@ public abstract class NxNode {
     this.container = container;
   }
   
-  public String getName() {
+  public String name() {
     return name;
   }
   
-  public long getId() {
+  public long id() {
     return id;
   }
   
@@ -39,13 +39,13 @@ public abstract class NxNode {
     return childrenCount > 0;
   }
   
-  public int getChildrenCount() {
+  public int childrenCount() {
     return childrenCount;
   }
   
-  public abstract Object getValue();
+  public abstract Object value();
   
-  public NxNode getChild(String name) {
+  public NxNode get(String name) {
     if(childrenCount == 0) {
       return null;
     }
@@ -55,7 +55,7 @@ public abstract class NxNode {
     return children.get(name);
   }
   
-  public Collection<NxNode> getChildren() {
+  public Collection<NxNode> children() {
     if(childrenCount == 0) {
       return Collections.emptyList();
     }
@@ -72,8 +72,8 @@ public abstract class NxNode {
   private Map<String, NxNode> fetchChildren() {
     Map<String, NxNode> children = new HashMap<>();
     for(int i = (int) firstChildId; i < firstChildId + childrenCount; i++) {
-      NxNode node = container.getNode(i);
-      children.put(node.getName(), node);
+      NxNode node = container.node(i);
+      children.put(node.name(), node);
     }
     return children;
   }

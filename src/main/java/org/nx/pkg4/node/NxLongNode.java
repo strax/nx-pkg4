@@ -11,7 +11,7 @@ public class NxLongNode extends NxNode {
     this.value = value;
   }
   
-  public Long getValue() {
+  public Long value() {
     return value;
   }
 }
