@@ -1,6 +1,6 @@
 package org.nx.pkg4;
 
-public class NxHeader {
+class NxHeader {
   private final long nodeCount, stringCount, bitmapCount, audioCount;
   
   private final long nodeOffset, stringTableOffset, bitmapTableOffset, audioTableOffset;
